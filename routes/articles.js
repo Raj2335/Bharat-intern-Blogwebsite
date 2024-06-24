@@ -1,72 +1,80 @@
-const express = require('express')
-const Article=require('./../models/article')
-const router = express.Router()
+const express = require('express');
+const Article = require('../models/article');
+const router = express.Router();
 
+// Route to render the form to create a new article
+router.get('/new', (req, res) => {
+    res.render('articles/new', { article: new Article() });
+});
 
-   router.get('/new',(req,res)=>{
-        res.render('articles/new',{article:new Article()})
-    })
-    router.get('/edit/:id', async(req,res)=>{
-        const article=await Article.findById(req.params.id)
-        res.render('articles/edit',{article:article})
-    })
+// Route to render the form to edit an existing article
+router.get('/edit/:id', async (req, res) => {
+    try {
+        const article = await Article.findById(req.params.id);
+        res.render('articles/edit', { article: article });
+    } catch (error) {
+        console.error('Error fetching article:', error.message);
+        res.redirect('/');
+    }
+});
 
-    router.get('/:id', async(req,res)=>{
-        const article=await Article.findById(req.params.id)
-        if(article == null) res.redirect('/')
-        res.render('articles/show',{article:article})
-    })
+// Route to show a specific article based on its slug
+router.get('/:slug', async (req, res) => {
+    try {
+        const article = await Article.findOne({ slug: req.params.slug });
+        if (article == null) {
+            res.redirect('/');
+        } else {
+            res.render('articles/show', { article: article });
+        }
+    } catch (error) {
+        console.error('Error fetching article by slug:', error.message);
+        res.redirect('/');
+    }
+});
 
-router.post('/',async(req,res)=>{
-   let article= new Article({
+// Route to delete an article
+router.delete('/:id', async (req, res) => {
+    try {
+        await Article.findByIdAndDelete(req.params.id);
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error deleting article:', error.message);
+        res.redirect('/');
+    }
+});
+
+// Route to create a new article
+router.post('/', async (req, res) => {
+    let article = new Article({
         title: req.body.title,
         description: req.body.description,
         markdown: req.body.markdown
-    })
-    try{
-        article=await article.save()
-        res.redirect(`/articles/${article.id}`)
-    } catch(e){
-        res.render('articles/new',{article: article})
-    } 
+    });
 
-})
+    try {
+        article = await article.save();
+        res.redirect(`/articles/${article.slug}`);
+    } catch (e) {
+        console.error('Error saving article:', e.message);
+        res.render('articles/new', { article: article });
+    }
+});
 
-router.post('/',async(req, res)=>{
-    req.article=new Article()
-    next()
-},saveArticle('new'))
+// Route to update an existing article
+router.put('/:id', async (req, res) => {
+    try {
+        let article = await Article.findById(req.params.id);
+        article.title = req.body.title;
+        article.description = req.body.description;
+        article.markdown = req.body.markdown;
 
-router.put('/:id',async(req, res)=>{
-    request.article=await Article.findById(req.params.id)
-    next()
-},saveArticle('edit'))
+        article = await article.save();
+        res.redirect(`/articles/${article.slug}`);
+    } catch (e) {
+        console.error('Error updating article:', e.message);
+        res.render('articles/edit', { article: article });
+    }
+});
 
-
-router.delete('/:id', async(req,res)=>{
-    await Article.findByIdAndDelete(req.params.id)
-    res.redirect('/')
-
-})
-
-
-function saveArticle(path){
-    return async(req, res)=>{ 
-          let article= req.article
-        article.title=req.body.title,
-        article.description= req.body.description,
-        article.markdown= req.body.markdown
-
-    try{
-        article=await article.save()
-        res.redirect(`/articles/${article.id}`)
-    } catch(e){
-        res.render(`articles/${path}`,{article: article})
-    } 
-
-}}
-
-
-
-module.exports =router
-
+module.exports = router;
