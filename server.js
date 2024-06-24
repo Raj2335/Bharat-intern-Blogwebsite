@@ -5,7 +5,12 @@ const mongoose = require('mongoose');
 const methodOverride=require('method-override');
 const app = express();
 
-mongoose.connect('mongodb://localhost/bharatInternDatabase')
+mongoose.connect('mongodb://localhost/bharatInternDatabase', {
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((error) => {
+    console.error('Error connecting to MongoDB:', error.message);
+});
 
 app.set('view engine', 'ejs');
 app.set("views", "./views")
