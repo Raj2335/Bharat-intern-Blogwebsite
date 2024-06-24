@@ -6,6 +6,8 @@ const methodOverride=require('method-override');
 const app = express();
 
 mongoose.connect('mongodb://localhost/bharatInternDatabase', {
+    connectTimeoutMS: 10000, // 10 seconds
+    socketTimeoutMS: 45000, // 45 seconds
 }).then(() => {
     console.log('Connected to MongoDB');
 }).catch((error) => {
