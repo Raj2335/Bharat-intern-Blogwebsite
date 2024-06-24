@@ -5,7 +5,9 @@ const mongoose = require('mongoose');
 const methodOverride=require('method-override');
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/bharatInternDatabase', {
+mongoose.connect('mongodb:// 127.0.0.1:27017/bharatInternDatabase', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
     connectTimeoutMS: 10000, // 10 seconds
     socketTimeoutMS: 45000, // 45 seconds
 }).then(() => {
