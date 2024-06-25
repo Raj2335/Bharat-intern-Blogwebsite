@@ -1,11 +1,12 @@
-const express = require('express')
+const express = require ('express')
 const articleRouter = require("./routes/articles")
 const Article = require('./models/article')
 const mongoose = require('mongoose')
 const methodOverride = require('method-override')
 const app = express()
 
-mongoose.connect('mongodb://localhost/bharatInternDatabase')
+mongoose.connect('mongodb://127.0.0.1:27017/bharatInternDatabase')
+//mongodb://localhost:27017/
 app.set("views", "./viewS")
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: false}))
